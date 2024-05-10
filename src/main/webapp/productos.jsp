@@ -67,54 +67,11 @@
 
     <div class="album py-5 bg-light">
         <div class="container">
-
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="card mb-4 box-shadow">
-                        <img th:src="@{/imagenes/ImgUno.png}" alt="">
-                        <div class="card-body">
-                            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
-                                </div>
-                                <small class="text-muted">9 mins</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card mb-4 box-shadow">
-                        <img th:src="@{/imagenes/ImgDos.png}" alt="">                        <div class="card-body">
-                            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
-                                </div>
-                                <small class="text-muted">9 mins</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card mb-4 box-shadow">
-                        <img th:src="@{/imagenes/ImgTres.jpg}" alt="">
-                        <div class="card-body">
-                            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
-                                </div>
-                                <small class="text-muted">9 mins</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+				<div class="row" id="row">
+				</div>
+				<!-- <button type="button" class="btn btn-outline-primary" onclick="lanzaCartas();">Lanzar cartas</button> -->
+        </div>
     </div>
-        </div></div>
 </main>
 
 <footer class="text-muted">
@@ -142,11 +99,35 @@ document.addEventListener("DOMContentLoaded", function(event) {
         "GET, POST, PUT, DELETE, OPTIONS, HEAD")
     xhr.send();
     xhr.onload = function() {
-    	console.log("respuesta del servidor : " + xhr);
     if (xhr.readyState === XMLHttpRequest.DONE) {
-        if (xhr.status === 0) {
-        	console.log("verificamos si obtenemos la información");
-        	console.log("respuesta: " + xhr.response);
+        if (xhr.status === 200) {
+        	console.log("respuesta: " + JSON.parse(xhr.response));
+        	var arrResponse = JSON.parse(xhr.response);
+        	const row = document.getElementById("row");
+			//const {gasolina,numbers} = arrResponse;
+			//if(gasolina === 0 ) numbers.push(gasolina);
+        	arrResponse.map(data=>{
+        		const div2 = document.createElement("div");
+      			div2.classList.add("col-md-2");
+      			row.appendChild(div2);
+      			const div3 = document.createElement("div");
+      			div3.className += 'card mb-2 box-shadow';
+      			div2.appendChild(div3);
+      			const div4 = document.createElement("div");
+      			div4.className = 'card-body';
+      			div3.appendChild(div4);
+      			
+      			const img = document.createElement("img");
+				img.src=data.images[1]
+				img.style = "width:85px;heigth:85px;"
+				img.id = "cards";
+				const p = document.createElement("p");
+				const datos = document.createTextNode(data.description);
+				p.appendChild(datos);
+				//img.value = numbers[i];
+				div4.appendChild(img);
+				div4.appendChild(p);
+        	});
         }
         }
       }
