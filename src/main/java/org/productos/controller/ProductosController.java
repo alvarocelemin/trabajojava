@@ -25,15 +25,8 @@ public class ProductosController {
 		HashMap<String, String> m = new HashMap<>();
 		ProductosCliente products = new ProductosCliente();
 		StringBuilder stringbuilder = new StringBuilder();
-		
-		/*List<ProductosDTO> list = products.listProductos();
-		for(ProductosDTO product: list) {
-			m.put("Pid", String.valueOf(product.getPid()));
-			m.put("Name", product.getName());
-			m.put("Description", product.getDescription());
-			m.put("PriceFinal", String.valueOf(product.getPriceFinal()));
-		}*/
-		return Response.ok(products.listProductos()).build();
+		String response = products.listProductos();
+		return Response.ok(response).build();
 	}
 	@POST
 	@Path("/crear")
@@ -49,8 +42,7 @@ public class ProductosController {
 		*/
 		ProductosCliente products = new ProductosCliente();
 		//StringBuilder stringbuilder = new StringBuilder();
-		String response = products.crearProductos(producto.title,producto.price,
-				producto.description,producto.categoryId,producto.images);
+		String response = products.crearProductos(producto);
 		return Response.ok(response).build();
 	}
 }

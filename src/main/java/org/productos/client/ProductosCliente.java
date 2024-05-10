@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -17,10 +18,14 @@ import org.productos.dto.ProductosDTO;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.json.Json;
+import jakarta.json.stream.JsonParser;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.Invocation;
 import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.Form;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
@@ -28,7 +33,37 @@ import jakarta.ws.rs.core.Response;
 
 public class ProductosCliente {
 	
-	public String listProductos() throws IOException{
+	/*
+	 * listado de productos usando jakarta
+	 */
+	
+	public String listProductos() {
+		String response = "";
+		try {
+            Client cliente = ClientBuilder.newClient();
+
+            String url = "https://api.escuelajs.co/api/v1/products";
+
+            Response respuesta = cliente.target(url)
+                .request(MediaType.APPLICATION_JSON)
+                .get();
+
+            int codigoRespuesta = respuesta.getStatus();
+
+            response = respuesta.readEntity(String.class);
+            //System.out.println("Respuesta: " + cuerpoRespuesta);
+
+            // Cerrar el cliente
+            cliente.close();
+        } catch (Exception e) {
+           response = "respuesta : " +  e.getMessage();
+        }
+		return response;
+	}
+	/*
+	 * Listado de productos usando java .net
+	 */
+	/*public String listProductos() throws IOException{
 		URL url = new URL("https://api.escuelajs.co/api/v1/products");
 		List<?> list= null;
 		StringBuilder string = new StringBuilder();
@@ -53,81 +88,33 @@ public class ProductosCliente {
 			throw new RuntimeException("Failed: HTPP error " + responseCode);
 		}
 		return response.toString();
-	}
-	public String crearProductos(String title,int price, String description, int categoryid,List images) {
-		StringBuilder response = new StringBuilder();
+	}*/
+	
+	/*
+	 * Cración de productos usando jakarta para consumir el fake api
+	 */
+	public String crearProductos(ProductosDTO productos) {
+		String responseBody = "";
 		try {
-			
-			URL url = new URL("https://api.escuelajs.co/api/v1/products");
-			Map<String,Object> objetoRequest = new LinkedHashMap<>();
-			//ProductosDTO productos = new ProductosDTO();
-			objetoRequest.put("title", title);
-			objetoRequest.put("price", price);
-			objetoRequest.put("description", description);
-			objetoRequest.put("categoryId", categoryid);
-			objetoRequest.put("images", images);
-			StringBuilder postData = new StringBuilder();
-			for(Map.Entry<String, Object> parametros:objetoRequest.entrySet()) {
-				if(postData.length() != 0) {
-					postData.append('&');
-				}
-				postData.append(URLEncoder.encode(parametros.getKey(),"UTF-8"));
-				postData.append('=');
-				postData.append(URLEncoder.encode(String.valueOf(parametros.getValue()),"UTF-8"));
-			}
-			byte[] postBytes = postData.toString().getBytes("UTF-8");
-			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-			
-			conn.setRequestMethod("POST");
-			conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-			conn.setRequestProperty("content-Length",String.valueOf(postBytes.length));
-			conn.setDoOutput(true);
-			conn.getOutputStream().write(postBytes);
-			//int responseCode = conn.getResponseCode();
-			Reader in = new BufferedReader(new InputStreamReader(conn.getInputStream(),"UTF-8"));
-			for(int c= in.read();c != -1; c=in.read()) {
-				response.append((char) c);;
-			}
-			/*if(responseCode == HttpURLConnection.HTTP_OK) {
-				productoCreado = true;
-			}*/
-		}
-		catch(Exception e) {
-			response.append("error : " + e.getMessage());
-		}
-		return response.toString();
+			Client cliente = ClientBuilder.newClient();
+
+			 String url = "https://api.escuelajs.co/api/v1/products";
+
+	            Response respuesta = cliente.target(url)
+	                .request(MediaType.APPLICATION_JSON)
+	                .post(Entity.json(productos));
+
+	            int codigoRespuesta = respuesta.getStatus();
+	            responseBody  = respuesta.readEntity(String.class);
+
+	           
+	            cliente.close();
+	        } catch (Exception e) {
+	        	responseBody = e.getMessage();
+	        }
+		
+		return responseBody;
 	}
 	
-	/*public List<ProductosDTO> listProductos(){
-		Response response = null;
-		WebTarget webTarget;
-		Client client = ClientBuilder.newClient();
-		List<ProductosDTO> list= null;
-		String responseJson = null;
-		ObjectMapper objectMapper = new ObjectMapper();
-		try {
-			webTarget = client.target("https://api.escuelajs.co/api/v1/products"); 
-			Invocation.Builder invocationBuilder = webTarget.request(MediaType.APPLICATION_JSON);
-			response = invocationBuilder.get();
-			
-			System.out.println("Status: " + response.getStatus());
-			
-			if(response.getStatus() != 200) {
-				throw new RuntimeException("Failed: HTPP error " + response.getStatus());
-			}
-			responseJson = response.readEntity(String.class);
-			
-			list  = objectMapper.readValue(responseJson, new TypeReference<List<ProductosDTO>>() {
-				
-			});
-			
-		}catch(Exception e){
-			System.out.println("error : " + e.getMessage());
-		}finally {
-			if(response != null) {
-				response.close();
-			}
-		}
-		return list;
-	}*/
+	
 }
