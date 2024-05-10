@@ -1,0 +1,5 @@
+org\productos\controller\productosApplication.class
+org\productos\controller\ProductosController.class
+org\productos\dto\ProductosDTO.class
+org\productos\client\ProductosCliente.class
+org\productos\productos\App.class
